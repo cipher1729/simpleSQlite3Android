@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="Sign In"
         android:onClick="signIn"
-        android:layout_weight="14.23"
+        android:layout_weight="50"
         android:layout_marginTop="200dp"></Button>
 
     <Button

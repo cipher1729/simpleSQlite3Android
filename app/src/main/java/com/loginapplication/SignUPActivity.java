@@ -10,23 +10,30 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class SignUPActivity extends Activity
 {
     EditText editTextUserName,editTextPassword,editTextConfirmPassword;
     Button btnCreateAccount;
-
-    LoginDataBaseAdapter loginDataBaseAdapter;
+    String currUserName, currPassword;
+    /*LoginDataBaseAdapter loginDataBaseAdapter;*/
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup);
-
-        // get Instance  of Database Adapter
-        loginDataBaseAdapter=new LoginDataBaseAdapter(this);
-        loginDataBaseAdapter=loginDataBaseAdapter.open();
-
-        // Get Refferences of Views
         editTextUserName=(EditText)findViewById(R.id.editTextUserNameToLogin);
         editTextPassword=(EditText)findViewById(R.id.editTextPasswordToLogin);
         editTextConfirmPassword=(EditText)findViewById(R.id.editTextConfirmPassword);
@@ -56,8 +63,12 @@ public class SignUPActivity extends Activity
                 else
                 {
                     // Save the Data in Database
-                    loginDataBaseAdapter.insertEntry(userName, password);
-                    Toast.makeText(getApplicationContext(), "Account Successfully Created ", Toast.LENGTH_LONG).show();
+                    //make post request here
+                   /* loginDataBaseAdapter.insertEntry(userName, password);*/
+                    currUserName = userName;
+                    currPassword = password;
+                    makePostRequest();
+                   // Toast.makeText(getApplicationContext(), "Account Successfully Created ", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -67,6 +78,20 @@ public class SignUPActivity extends Activity
         // TODO Auto-generated method stub
         super.onDestroy();
 
-        loginDataBaseAdapter.close();
+        /*loginDataBaseAdapter.close();*/
+    }
+
+    private void makePostRequest()
+    {
+            Util.insertIntoLogin("http://192.168.0.17:3000/addUser",currUserName, currPassword);
+
+            while(Util.polled==false);
+            if(Util.sb.toString().equals("Success!"))
+                Toast.makeText(getApplicationContext(), "Account Successfully Created ", Toast.LENGTH_LONG).show();
+            else if(Util.sb.toString().equals("Exists!"))
+                Toast.makeText(getApplicationContext(), "Account Already Exists! ", Toast.LENGTH_LONG).show();
+            else
+                Toast.makeText(getApplicationContext(), "Could not be created ", Toast.LENGTH_LONG).show();
+            Util.polled=false;
     }
 }
